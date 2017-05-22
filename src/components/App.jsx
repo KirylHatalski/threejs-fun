@@ -1,10 +1,10 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {THREE} from 'three';
+import {THREE} from 'three.js';
 import {getRandomColor} from '../utils'
 
 
-const STEP = Math.PI / 200
+const STEP = Math.PI / 50
 
 class App extends React.Component {
   constructor(props) {
@@ -49,8 +49,14 @@ class App extends React.Component {
     this.renderer.setSize(this.elem.clientWidth, this.elem.clientHeight)
     this.elem.appendChild(this.renderer.domElement)
 
+    let handleMouseMove = e => {
+      if (!(e.x - this.elem.clientWidth/2) || !(e.y - this.elem.clientHeight/2)) return
+      if (e.x - this.elem.clientWidth/2 === 0 || e.y - this.elem.clientWidth/2 === 0) return;
+      this.mesh.rotation.x += Math.PI/(e.x - this.elem.clientWidth/2)
+      this.mesh.rotation.y += Math.PI/(e.y - this.elem.clientHeight/2)
+    }
+
     window.addEventListener('keypress', e => {
-      console.log(this.mesh.position);
       switch (e.code) {
         case 'KeyA':
           this.mesh.rotation.y -= STEP
@@ -69,14 +75,12 @@ class App extends React.Component {
       }
     })
     window.addEventListener('mousedown', e => {
-      this.interval = setInterval(() => {
+      window.addEventListener('mousemove', handleMouseMove)
+      // this.interval = setInterval(() => {
         // this.nextCoords.x -= e.x
         // this.nextCoords.y -= e.y
-
-        this.mesh.rotation.x = Math.PI/(e.x - this.elem.clientWidth/2)
-        this.mesh.rotation.y = Math.PI/(e.y - this.elem.clientWidth/2)
         // console.log(this.mesh.rotation);
-      }, 1000/60)
+      // }, 1000/60)
       // this.nextCoords.x -= e.x
       // this.nextCoords.y -= e.y
     })
@@ -89,7 +93,8 @@ class App extends React.Component {
       //
       // console.log(this.mesh.position);
       this.nextCoords = {x: 0, y: 0, z: 0};
-      clearInterval(this.interval)
+      // clearInterval(this.interval)
+      window.removeEventListener('mousemove', handleMouseMove)
     })
 
   }
